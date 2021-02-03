@@ -43,7 +43,7 @@ class DeepWordBugAttacker(Attacker):
         * **x_orig** : Input sentence.
         """
         y_orig = clsf.get_pred([x_orig])[0]
-        print("Adv Original from attacker", y_orig)
+        # print("Adv Original from attacker", y_orig)
         inputs = x_orig.strip().lower().split(" ")
         losses = self.scorefunc(self.scoring, clsf, inputs, y_orig)  # 每个词消失后的loss向量
         indices = np.argsort(losses)
@@ -59,8 +59,8 @@ class DeepWordBugAttacker(Attacker):
 
         output2 = clsf.get_pred([self.config["processor"].detokenizer(advinputs)])[0]
         if target is None:
+            print("CHecking within attacker", output2, y_orig)
             if output2 != y_orig:
-                print("CHecking within attacker", output2, y_orig)
                 return self.config["processor"].detokenizer(advinputs), output2
         else:
             if int(output2) is int(target):
