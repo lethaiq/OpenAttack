@@ -43,6 +43,7 @@ class DeepWordBugAttacker(Attacker):
         * **x_orig** : Input sentence.
         """
         y_orig = clsf.get_pred([x_orig])[0]
+        print("Adv Original from attacker", y_orig)
         inputs = x_orig.strip().lower().split(" ")
         losses = self.scorefunc(self.scoring, clsf, inputs, y_orig)  # 每个词消失后的loss向量
         indices = np.argsort(losses)
