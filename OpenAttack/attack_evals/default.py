@@ -146,7 +146,7 @@ class DefaultAttackEval(AttackEval):
         if visualize:
             result_visualizer(res, sys.stdout.write)
 
-        print(len(self.all_y_orig))
+        print(len(self.all_y_org))
         print(len(self.all_y_true))
         print(len(self.all_y_adv))
         return res
