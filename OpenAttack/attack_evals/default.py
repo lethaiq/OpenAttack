@@ -161,6 +161,9 @@ class DefaultAttackEval(AttackEval):
         all_y_true = self.all_y_true
         all_y_adv = np.argmax(self.all_y_adv, 1)
         correct_idx = np.where(all_y_org == all_y_true)[0]
+        print(all_y_org)
+        print(all_y_true)
+        
         print(correct_idx)
         print(len(correct_idx)/total)
         return res
