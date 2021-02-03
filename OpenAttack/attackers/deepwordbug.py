@@ -62,7 +62,7 @@ class DeepWordBugAttacker(Attacker):
             if output2 != y_orig:
                 return self.config["processor"].detokenizer(advinputs), output2
         else:
-            if int(output2) is int(target):
+            if int(output2) != int(target):
                 return self.config["processor"].detokenizer(advinputs), output2
         return None
 
