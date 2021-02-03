@@ -189,6 +189,7 @@ class DefaultAttackEval(AttackEval):
 
         clsf_wrapper = MetaClassifierWrapper(self.classifier)
         for data in dataset:
+            print(data)
             assert isinstance(data, DataInstance)
             clsf_wrapper.set_meta(data.meta)
             y_org = self.classifier.get_prob([data.x], data.meta)[0]
