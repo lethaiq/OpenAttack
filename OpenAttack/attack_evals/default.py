@@ -149,6 +149,14 @@ class DefaultAttackEval(AttackEval):
         print(len(self.all_y_org))
         print(len(self.all_y_true))
         print(len(self.all_y_adv))
+
+        total = len(self.all_y_org)
+        all_y_org = np.argmax(all_y_org, 1)
+        all_y_true = np.argmax(all_y_true, 1)
+        all_y_adv = np.argmax(all_y_adv, 1)
+        correct_idx = np.where(all_y_org == all_y_true)[0]
+        print(correct_idx)
+        print(len(correct_idx)/total)
         return res
 
     def print(self):
