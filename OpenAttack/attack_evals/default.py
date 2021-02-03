@@ -136,9 +136,9 @@ class DefaultAttackEval(AttackEval):
                         y_orig = int(self.classifier.get_pred([x_orig], data.meta)[0])
 
                 if self.__progress_bar:
+                    print("TEST", y_orig.argmax(), y_adv.argmax(), y_orig)
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, tqdm_writer)
                 else:
-                    print("TEST", y_orig.argmax(), y_adv.argmax(), y_orig)
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, sys.stdout.write)
         
         res = self.get_result()
