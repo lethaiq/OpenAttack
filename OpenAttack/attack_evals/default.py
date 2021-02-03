@@ -177,7 +177,7 @@ class DefaultAttackEval(AttackEval):
         for data in dataset:
             assert isinstance(data, DataInstance)
             clsf_wrapper.set_meta(data.meta)
-            y_org = self.classifier.get_prob([x_orig], data.meta)[0]
+            y_org = self.classifier.get_prob([data.x], data.meta)[0]
             res = self.attacker(clsf_wrapper, data.x, data.target)
             if res is None:
                 info = self.__update(data.x, data.y, y_org, None, None)
