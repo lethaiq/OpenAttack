@@ -90,6 +90,10 @@ class DefaultAttackEval(AttackEval):
         self.classifier = classifier
         
         self.__progress_bar = progress_bar
+
+        self.all_y_true = []
+        self.all_y_org = []
+        self.all_y_adv = []
     
     def eval(self, dataset, total_len=None, visualize=False):
         """
@@ -141,6 +145,10 @@ class DefaultAttackEval(AttackEval):
 
         if visualize:
             result_visualizer(res, sys.stdout.write)
+
+        print(len(self.all_y_orig))
+        print(len(self.all_y_true))
+        print(len(self.all_y_adv))
         return res
 
     def print(self):
@@ -152,9 +160,9 @@ class DefaultAttackEval(AttackEval):
     def dumps(self):
         return json.dumps( self.get_result() )
     
-    def __update(self, sentA, sentB):
+    def __update(self, sentA, y_true, y_org, sentB, y_adv):
         info = self.measure(sentA, sentB)
-        return self.update(info)
+        return self.update(info, y_true, y_org, y_adv)
 
     def eval_results(self, dataset):
         """
@@ -169,11 +177,12 @@ class DefaultAttackEval(AttackEval):
         for data in dataset:
             assert isinstance(data, DataInstance)
             clsf_wrapper.set_meta(data.meta)
+            y_org = self.classifier.get_prob([x_orig], data.meta)[0]
             res = self.attacker(clsf_wrapper, data.x, data.target)
             if res is None:
-                info = self.__update(data.x, None)
+                info = self.__update(data.x, data.y, y_org, None, None)
             else:
-                info = self.__update(data.x, res[0])
+                info = self.__update(data.x, data.y, y_org, res[0], res[])
             if not info["Succeed"]:
                 yield (data, None, None, info)
             else:
@@ -255,7 +264,7 @@ class DefaultAttackEval(AttackEval):
             info["Word Modif. Rate"] = self.__get_modification(input_, attack_result)
         return info
         
-    def update(self, info):
+    def update(self, info, y_true, y_org, y_adv):
         """
         :param dict info: The result returned by ``measure`` method.
         :return: Just return the parameter **info**.
@@ -263,6 +272,10 @@ class DefaultAttackEval(AttackEval):
 
         In this method, we accumulate the results from ``measure`` method.
         """
+        self.all_y_true.append(y_true)
+        self.all_y_org.append(y_org)
+        self.all_y_adv.append(y_adv)
+
         if "total" not in self.__result:
             self.__result["total"] = 0
         self.__result["total"] += 1
