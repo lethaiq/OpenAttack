@@ -182,7 +182,7 @@ class DefaultAttackEval(AttackEval):
             if res is None:
                 info = self.__update(data.x, data.y, y_org, None, None)
             else:
-                info = self.__update(data.x, data.y, y_org, res[0], res[])
+                info = self.__update(data.x, data.y, y_org, res[0], res[1])
             if not info["Succeed"]:
                 yield (data, None, None, info)
             else:
