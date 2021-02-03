@@ -155,7 +155,7 @@ class DefaultAttackEval(AttackEval):
         print(self.all_y_org[:5])
         print(self.all_y_true[:5])
         print(self.all_y_adv[:5])
-        
+
         total = len(self.all_y_org)
         all_y_org = np.argmax(self.all_y_org, 1)
         all_y_true = np.argmax(self.all_y_true, 1)
@@ -174,9 +174,9 @@ class DefaultAttackEval(AttackEval):
     def dumps(self):
         return json.dumps( self.get_result() )
     
-    def __update(self, sentA, y_true, y_org, sentB, y_adv):
+    def __update(self, sentA, sentB):
         info = self.measure(sentA, sentB)
-        return self.update(info, y_true, y_org, y_adv)
+        return self.update(info)
 
     def eval_results(self, dataset):
         """
@@ -194,13 +194,14 @@ class DefaultAttackEval(AttackEval):
             y_org = self.classifier.get_prob([data.x], data.meta)[0]
             res = self.attacker(clsf_wrapper, data.x, data.target)
             if res is None:
-                info = self.__update(data.x, data.y, y_org, None, None)
+                info = self.__update(data.x, None)
+                y_adv = y_org
             else:
-                info = self.__update(data.x, data.y, y_org, res[0], res[1])
-                print("Checking")
-                print("Adv prediction from attacker", res[1])
+                info = self.__update(data.x, res[0])
                 y_adv = self.classifier.get_prob([res[0]], data.meta)[0]
-                print("Adv prediction from classifier", y_adv)
+            self.all_y_true.append(data.y)
+            self.all_y_org.append(y_org)
+            self.all_y_adv.append(y_adv)
             if not info["Succeed"]:
                 yield (data, None, None, info)
             else:
@@ -282,7 +283,7 @@ class DefaultAttackEval(AttackEval):
             info["Word Modif. Rate"] = self.__get_modification(input_, attack_result)
         return info
         
-    def update(self, info, y_true, y_org, y_adv):
+    def update(self, info):
         """
         :param dict info: The result returned by ``measure`` method.
         :return: Just return the parameter **info**.
@@ -290,9 +291,7 @@ class DefaultAttackEval(AttackEval):
 
         In this method, we accumulate the results from ``measure`` method.
         """
-        self.all_y_true.append(y_true)
-        self.all_y_org.append(y_org)
-        self.all_y_adv.append(y_adv)
+ 
 
         if "total" not in self.__result:
             self.__result["total"] = 0
