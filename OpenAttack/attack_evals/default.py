@@ -291,8 +291,6 @@ class DefaultAttackEval(AttackEval):
 
         In this method, we accumulate the results from ``measure`` method.
         """
- 
-
         if "total" not in self.__result:
             self.__result["total"] = 0
         self.__result["total"] += 1
