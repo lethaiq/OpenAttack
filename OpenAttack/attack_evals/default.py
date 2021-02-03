@@ -124,8 +124,8 @@ class DefaultAttackEval(AttackEval):
             original_texts.append(x_orig)
             perturbed_texts.append(x_adv)
             
+            counter += 1
             if visualize:
-                counter += 1
                 try:
                     if x_adv is not None:
                         res = self.classifier.get_prob([x_orig, x_adv], data.meta)
@@ -146,6 +146,7 @@ class DefaultAttackEval(AttackEval):
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, tqdm_writer)
                 else:
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, sys.stdout.write)
+        
         res = self.get_result()
         if self.__config["running_time"]:
             res["Avg. Running Time"] = (time.time() - time_start) / counter
