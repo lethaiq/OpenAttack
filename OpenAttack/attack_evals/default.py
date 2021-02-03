@@ -171,7 +171,7 @@ class DefaultAttackEval(AttackEval):
             elif all_y_adv[i] != all_y_org[i]:
                 tmp['result_type'] = 'Successful'
             else:
-                tmp['result_type'] == 'Failed'
+                tmp['result_type'] = 'Failed'
             rt.append(tmp)
 
         correct_idx = np.where(all_y_org == all_y_true)[0]
