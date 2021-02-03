@@ -193,6 +193,10 @@ class DefaultAttackEval(AttackEval):
                 info = self.__update(data.x, data.y, y_org, None, None)
             else:
                 info = self.__update(data.x, data.y, y_org, res[0], res[1])
+                print("Checking")
+                print("Adv prediction from attacker", res[1])
+                y_adv = self.classifier.get_prob([res[0]], data.meta)[0]
+                print("Adv prediction from classifier", y_adv)
             if not info["Succeed"]:
                 yield (data, None, None, info)
             else:
