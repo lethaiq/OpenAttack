@@ -59,7 +59,7 @@ class DeepWordBugAttacker(Attacker):
 
         output2 = clsf.get_pred([self.config["processor"].detokenizer(advinputs)])[0]
         if target is None:
-            print("CHecking within attacker", output2, y_orig)
+            # print("CHecking within attacker", output2, y_orig)
             if output2 != y_orig:
                 return self.config["processor"].detokenizer(advinputs), output2
         else:
