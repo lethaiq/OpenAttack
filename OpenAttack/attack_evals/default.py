@@ -138,6 +138,7 @@ class DefaultAttackEval(AttackEval):
                 if self.__progress_bar:
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, tqdm_writer)
                 else:
+                    print("TEST", y_orig.argmax(), y_adv.argmax(), y_orig)
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, sys.stdout.write)
         
         res = self.get_result()
@@ -152,9 +153,9 @@ class DefaultAttackEval(AttackEval):
         print(len(self.all_y_adv))
 
         total = len(self.all_y_org)
-        all_y_org = np.argmax(all_y_org, 1)
-        all_y_true = np.argmax(all_y_true, 1)
-        all_y_adv = np.argmax(all_y_adv, 1)
+        all_y_org = np.argmax(self.all_y_org, 1)
+        all_y_true = np.argmax(self.all_y_true, 1)
+        all_y_adv = np.argmax(self.all_y_adv, 1)
         correct_idx = np.where(all_y_org == all_y_true)[0]
         print(correct_idx)
         print(len(correct_idx)/total)
