@@ -6,6 +6,7 @@ from ..utils import visualizer, result_visualizer, check_parameters, DataInstanc
 from ..exceptions import ClassifierNotSupportException
 from ..text_processors import DefaultTextProcessor
 import numpy as np
+import pandas as pd
 
 DEFAULT_CONFIG = {
     "processor": DefaultTextProcessor(),
@@ -96,7 +97,7 @@ class DefaultAttackEval(AttackEval):
         self.all_y_org = []
         self.all_y_adv = []
     
-    def eval(self, dataset, total_len=None, visualize=False):
+    def eval(self, dataset, total_len=None, visualize=False, output_file=None):
         """
         :param Dataset dataset: A :py:class:`.Dataset` or a list of :py:class:`.DataInstance`.
         :type dataset: list or generator
@@ -111,6 +112,8 @@ class DefaultAttackEval(AttackEval):
             total_len = len(dataset)
         
         counter = 0
+        original_texts = []
+        perturbed_texts = []
 
         def tqdm_writer(x):
             return tqdm.write(x, end="")
@@ -118,29 +121,30 @@ class DefaultAttackEval(AttackEval):
         time_start = time.time()
         for data, x_adv, y_adv, info in (tqdm(self.eval_results(dataset), total=total_len) if self.__progress_bar else self.eval_results(dataset)):
             x_orig = data.x
+            original_texts.append(x_orig)
+            perturbed_texts.append(x_adv)
             counter += 1
+            try:
+                if x_adv is not None:
+                    res = self.classifier.get_prob([x_orig, x_adv], data.meta)
+                    y_orig = res[0]
+                    y_adv = res[1]
+                else:
+                    y_orig = self.classifier.get_prob([x_orig], data.meta)[0]
+            except ClassifierNotSupportException:
+                if x_adv is not None:
+                    res = self.classifier.get_pred([x_orig, x_adv], data.meta)
+                    y_orig = int(res[0])
+                    y_adv = int(res[1])
+                else:
+                    y_orig = int(self.classifier.get_pred([x_orig], data.meta)[0])
+            
             if visualize:
-                try:
-                    if x_adv is not None:
-                        res = self.classifier.get_prob([x_orig, x_adv], data.meta)
-                        y_orig = res[0]
-                        y_adv = res[1]
-                    else:
-                        y_orig = self.classifier.get_prob([x_orig], data.meta)[0]
-                except ClassifierNotSupportException:
-                    if x_adv is not None:
-                        res = self.classifier.get_pred([x_orig, x_adv], data.meta)
-                        y_orig = int(res[0])
-                        y_adv = int(res[1])
-                    else:
-                        y_orig = int(self.classifier.get_pred([x_orig], data.meta)[0])
-
                 if self.__progress_bar:
                     print("TEST", y_orig, y_adv)
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, tqdm_writer)
                 else:
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, sys.stdout.write)
-        
         res = self.get_result()
         if self.__config["running_time"]:
             res["Avg. Running Time"] = (time.time() - time_start) / counter
@@ -148,24 +152,45 @@ class DefaultAttackEval(AttackEval):
         if visualize:
             result_visualizer(res, sys.stdout.write)
 
-        # print(len(self.all_y_org))
-        # print(len(self.all_y_true))
-        # print(len(self.all_y_adv))
-
-        # print(self.all_y_org[:5])
-        # print(self.all_y_true[:5])
-        # print(self.all_y_adv[:5])
-
+        rt = []
         total = len(self.all_y_org)
-        all_y_org = np.argmax(self.all_y_org, 1)
-        all_y_true = self.all_y_true
+        all_y_true = np.array(self.all_y_true)
         all_y_adv = np.argmax(self.all_y_adv, 1)
+        all_y_org = np.argmax(self.all_y_org, 1)
+        for i in range(total):
+            tmp = {}
+            tmp['original_text'] = original_texts[i]
+            tmp['perturbed_text'] = perturbed_texts[i]
+            tmp['ground_truth_output'] = all_y_true[i]
+            tmp['num_queries'] = None
+            tmp['original_score'] = self.all_y_org[i][all_y_true[i]]
+            tmp['pertrubed_output'] = all_y_adv[i]
+
+            if all_y_org[i] != all_y_true:
+                tmp['result_type'] = 'Skipped'
+            elif all_y_adv[i] != all_y_org[i]:
+                tmp['result_type'] = 'Successful'
+            else:
+                tmp['result_type'] == 'Failed'
+            rt.append(tmp)
+
         correct_idx = np.where(all_y_org == all_y_true)[0]
-        print(all_y_org)
-        print(all_y_true)
+        skipped_idx = np.where(all_y_org != all_y_true)[0]
+        successful_idx = np.where(all_y_adv[correct_idx] != all_y_org[correct_idx])[0]
+        failed_idx = np.where(all_y_adv[correct_idx] == all_y_org[correct_idx])[0]
+        normal_accuracy = len(correct_idx)/total
+        successful_rate = len(successful_idx)/total
+        attack_accuracy = len(failed_idx)/total
+
+        print("Normal Accuracy", round(normal_accuracy,2))
+        print("Attack Success Rate", round(successful_rate,2))
+        print("Accuracy under Attack", round(attack_accuracy, 2))
         
-        print(correct_idx)
-        print(len(correct_idx)/total)
+        if output_file:
+            df = pd.DataFrame.from_dict(rt)
+            df.to_csv(output_file, index=None)
+            print("output saved to ", output_file)
+            
         return res
 
     def print(self):
