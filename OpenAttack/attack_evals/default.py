@@ -148,17 +148,17 @@ class DefaultAttackEval(AttackEval):
         if visualize:
             result_visualizer(res, sys.stdout.write)
 
-        print(len(self.all_y_org))
-        print(len(self.all_y_true))
-        print(len(self.all_y_adv))
+        # print(len(self.all_y_org))
+        # print(len(self.all_y_true))
+        # print(len(self.all_y_adv))
 
-        print(self.all_y_org[:5])
-        print(self.all_y_true[:5])
-        print(self.all_y_adv[:5])
+        # print(self.all_y_org[:5])
+        # print(self.all_y_true[:5])
+        # print(self.all_y_adv[:5])
 
         total = len(self.all_y_org)
         all_y_org = np.argmax(self.all_y_org, 1)
-        all_y_true = np.argmax(self.all_y_true, 1)
+        all_y_true = self.all_y_true
         all_y_adv = np.argmax(self.all_y_adv, 1)
         correct_idx = np.where(all_y_org == all_y_true)[0]
         print(correct_idx)
@@ -189,7 +189,6 @@ class DefaultAttackEval(AttackEval):
 
         clsf_wrapper = MetaClassifierWrapper(self.classifier)
         for data in dataset:
-            print(data)
             assert isinstance(data, DataInstance)
             clsf_wrapper.set_meta(data.meta)
             y_org = self.classifier.get_prob([data.x], data.meta)[0]
