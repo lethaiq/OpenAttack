@@ -123,23 +123,24 @@ class DefaultAttackEval(AttackEval):
             x_orig = data.x
             original_texts.append(x_orig)
             perturbed_texts.append(x_adv)
-            counter += 1
-            try:
-                if x_adv is not None:
-                    res = self.classifier.get_prob([x_orig, x_adv], data.meta)
-                    y_orig = res[0]
-                    y_adv = res[1]
-                else:
-                    y_orig = self.classifier.get_prob([x_orig], data.meta)[0]
-            except ClassifierNotSupportException:
-                if x_adv is not None:
-                    res = self.classifier.get_pred([x_orig, x_adv], data.meta)
-                    y_orig = int(res[0])
-                    y_adv = int(res[1])
-                else:
-                    y_orig = int(self.classifier.get_pred([x_orig], data.meta)[0])
             
             if visualize:
+                counter += 1
+                try:
+                    if x_adv is not None:
+                        res = self.classifier.get_prob([x_orig, x_adv], data.meta)
+                        y_orig = res[0]
+                        y_adv = res[1]
+                    else:
+                        y_orig = self.classifier.get_prob([x_orig], data.meta)[0]
+                except ClassifierNotSupportException:
+                    if x_adv is not None:
+                        res = self.classifier.get_pred([x_orig, x_adv], data.meta)
+                        y_orig = int(res[0])
+                        y_adv = int(res[1])
+                    else:
+                        y_orig = int(self.classifier.get_pred([x_orig], data.meta)[0])
+                
                 if self.__progress_bar:
                     print("TEST", y_orig, y_adv)
                     visualizer(counter, x_orig, y_orig, x_adv, y_adv, info, tqdm_writer)
