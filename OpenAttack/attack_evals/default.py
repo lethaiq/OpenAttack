@@ -166,7 +166,7 @@ class DefaultAttackEval(AttackEval):
             tmp['original_score'] = self.all_y_org[i][all_y_true[i]]
             tmp['pertrubed_output'] = all_y_adv[i]
 
-            if all_y_org[i] != all_y_true:
+            if all_y_org[i] != all_y_true[i]:
                 tmp['result_type'] = 'Skipped'
             elif all_y_adv[i] != all_y_org[i]:
                 tmp['result_type'] = 'Successful'
@@ -190,7 +190,7 @@ class DefaultAttackEval(AttackEval):
             df = pd.DataFrame.from_dict(rt)
             df.to_csv(output_file, index=None)
             print("output saved to ", output_file)
-            
+
         return res
 
     def print(self):
