@@ -5,6 +5,7 @@ from tqdm import tqdm
 from ..utils import visualizer, result_visualizer, check_parameters, DataInstance, Dataset
 from ..exceptions import ClassifierNotSupportException
 from ..text_processors import DefaultTextProcessor
+import numpy as np
 
 DEFAULT_CONFIG = {
     "processor": DefaultTextProcessor(),
