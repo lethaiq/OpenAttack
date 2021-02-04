@@ -158,7 +158,7 @@ class Translator(object):
 
             # Run one step.
             decOut, decStates, attn = self.model.decoder(
-                inp, context.cuda(), decStates.cuda(), context_lengths=context_lengths)
+                inp, context.cuda(), decStates, context_lengths=context_lengths)
             decOut = decOut.squeeze(0)
             # decOut: beam x rnn_size
 
