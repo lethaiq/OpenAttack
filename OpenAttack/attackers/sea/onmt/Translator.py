@@ -228,7 +228,7 @@ class Translator(object):
         if self.opt.tgt:
             tgt = batch.tgt.data.index_select(1, perm)
         for b in range(batch_size):
-            src_vocab = data.src_vocabs[inds[b]]
+            src_vocab = data.src_vocabs[inds[b].item()]
             predBatch.append(
                 [self.buildTargetTokens(pred[b][n], src[:, b],
                                         attn[b][n], src_vocab)
