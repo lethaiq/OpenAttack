@@ -104,7 +104,7 @@ class Translator(object):
 
         # (1) Run the encoder on the src.
         _, src_lengths = batch.src
-        src = IO.make_features(batch, 'src')
+        src = IO.make_features(batch, 'src').cuda()
         encStates, context = self.model.encoder(src, src_lengths)
         decStates = self.model.decoder.init_decoder_state(
                                         src, context, encStates)
