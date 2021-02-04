@@ -59,6 +59,8 @@ class OnmtModel(object):
         batch = next(testData.__iter__())
         _, src_lengths = batch.src
         src = onmt.IO.make_features(batch, 'src')
+        src = src.cuda()
+        src_lengths = src_lengths.cuda()
         encStates, context = self.translator.model.encoder(src, src_lengths)
         decStates = self.translator.model.decoder.init_decoder_state(
                                         src, context, encStates)
