@@ -85,7 +85,7 @@ class Translator(object):
             # Log prob of each word.
             out = self.model.generator.forward(dec)
             tgt = tgt.unsqueeze(1)
-            scores = out.data.gather(1, tgt)
+            scores = out.data.gather(1, tgt.cuda())
             scores.masked_fill_(tgt.eq(tgt_pad), 0)
             # print(goldScores + scores)
             # print('YO')
