@@ -78,7 +78,7 @@ class Translator(object):
         tt = torch.cuda if self.opt.cuda else torch
         goldScores = tt.FloatTensor(batch.batch_size).fill_(0)
         decOut, decStates, attn = self.model.decoder(
-            tgt_in, context, decStates, context_lengths=src_lengths)
+            tgt_in.cuda(), context.cuda(), decStates, context_lengths=src_lengths.cuda())
 
         tgt_pad = self.fields["tgt"].vocab.stoi[IO.PAD_WORD]
         for dec, tgt in zip(decOut, batch.tgt[1:].data):
