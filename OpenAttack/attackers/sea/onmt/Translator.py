@@ -65,11 +65,11 @@ class Translator(object):
 
     def _runTarget(self, batch, data):
         _, src_lengths = batch.src
-        src = IO.make_features(batch, 'src')
+        src = IO.make_features(batch, 'src').cuda()
         tgt_in = IO.make_features(batch, 'tgt')[:-1]
 
         #  (1) run the encoder on the src
-        encStates, context = self.model.encoder(src, src_lengths)
+        encStates, context = self.model.encoder(src, src_lengths.cuda())
         decStates = self.model.decoder.init_decoder_state(
                                         src, context, encStates)
 
