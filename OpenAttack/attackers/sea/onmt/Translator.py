@@ -81,11 +81,13 @@ class Translator(object):
             tgt_in.cuda(), context.cuda(), decStates, context_lengths=src_lengths.cuda())
 
         tgt_pad = self.fields["tgt"].vocab.stoi[IO.PAD_WORD]
+        tgt_pad = tgt_pad.cuda()
         for dec, tgt in zip(decOut, batch.tgt[1:].data):
             # Log prob of each word.
+            tgt = tgt.cuda()
             out = self.model.generator.forward(dec)
             tgt = tgt.unsqueeze(1)
-            scores = out.data.gather(1, tgt.cuda())
+            scores = out.data.gather(1, tgt)
             scores.masked_fill_(tgt.eq(tgt_pad), 0)
             # print(goldScores + scores)
             # print('YO')
