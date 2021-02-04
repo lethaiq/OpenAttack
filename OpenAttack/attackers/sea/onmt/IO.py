@@ -185,7 +185,7 @@ def get_fields(n_src_features, n_tgt_features):
         return alignment
 
     fields["src_map"] = torchtext.data.Field(
-        use_vocab=False, tensor_type=torch.FloatTensor,
+        use_vocab=False, dtype=torch.FloatTensor,
         postprocessing=make_src, sequential=False)
 
     def make_tgt(data, _):
