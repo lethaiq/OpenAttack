@@ -196,11 +196,11 @@ def get_fields(n_src_features, n_tgt_features):
         return alignment
 
     fields["alignment"] = torchtext.data.Field(
-        use_vocab=False, dtype=torch.LongTensor,
+        use_vocab=False, dtype=torch.FloatTensor,
         postprocessing=make_tgt, sequential=False)
 
     fields["indices"] = torchtext.data.Field(
-        use_vocab=False, dtype=torch.LongTensor,
+        use_vocab=False, dtype=torch.FloatTensor,
         sequential=False)
 
     return fields
