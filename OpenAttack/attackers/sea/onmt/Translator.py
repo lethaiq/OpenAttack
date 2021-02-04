@@ -154,7 +154,7 @@ class Translator(object):
 
             # Temporary kludge solution to handle changed dim expectation
             # in the decoder
-            inp = inp.unsqueeze(2)
+            inp = inp.unsqueeze(2).cuda()
 
             # Run one step.
             decOut, decStates, attn = self.model.decoder(
