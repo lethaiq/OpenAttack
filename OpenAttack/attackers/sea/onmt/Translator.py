@@ -81,7 +81,7 @@ class Translator(object):
             tgt_in.cuda(), context.cuda(), decStates, context_lengths=src_lengths.cuda())
 
         tgt_pad = self.fields["tgt"].vocab.stoi[IO.PAD_WORD]
-        tgt_pad = tgt_pad.cuda()
+        # tgt_pad = tgt_pad.cuda()
         for dec, tgt in zip(decOut, batch.tgt[1:].data):
             # Log prob of each word.
             tgt = tgt.cuda()
